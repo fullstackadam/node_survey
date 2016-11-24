@@ -1,0 +1,27 @@
+{
+  "name": "node_survey",
+  "version": "1.0.0",
+  "description": "Survey app for SumoMe",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fullstackadam/node_survey.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fullstackadam/node_survey/issues"
+  },
+  "homepage": "https://github.com/fullstackadam/node_survey#readme",
+  "dependencies": {
+    "ejs": "^2.5.2",
+    "express": "^4.14.0",
+    "sequelize": "^3.27.0"
+  },
+  "devDependencies": {
+    "jshint": "^2.9.4"
+  }
+}
