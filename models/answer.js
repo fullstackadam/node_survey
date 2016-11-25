@@ -1,9 +1,19 @@
-var sequelize = require('sequelize');
+var Sequelize = require('sequelize');
+var Question = require('./question');
 
-var Answer = sequelize.define('answer', {
-  title: Sequelize.STRING,
-  description: Sequelize.TEXT,
-  deadline: Sequelize.DATE
-});
+module.exports = function(sequelize) {
+	var Answer = sequelize.define('answer', {
+	  text: {
+	  	type: Sequelize.STRING,
+	  	notNull: true
+	  },
+	});
 
-module.exports = Answer;
+	//Answer.belongsTo(Question);
+
+	Answer.sync({force: true}).then(function() {
+		return Answer.create({
+			text: 'bad answer 1'
+		});
+	});
+};
