@@ -17,10 +17,14 @@
   },
   "homepage": "https://github.com/fullstackadam/node_survey#readme",
   "dependencies": {
+    "client-sessions": "^0.7.0",
     "connect": "^3.5.0",
+    "connect-session-sequelize": "^4.1.0",
+    "cookie-parser": "^1.4.3",
     "ejs": "^2.5.2",
     "environment-vars": "^1.0.3",
     "express": "^4.14.0",
+    "express-session": "^1.14.2",
     "mysql": "^2.12.0",
     "passport-http": "^0.3.0",
     "sequelize": "^3.27.0"
