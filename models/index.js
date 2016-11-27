@@ -3,7 +3,8 @@ var Sequelize = require('sequelize'),
 	User = require('./user'),
 	Survey = require('./survey'),
 	Question = require('./question'),
-	Answer = require('./answer');
+	Answer = require('./answer'),
+	Session = require('./session');
 
 /*sequelize.authenticate()
 .then(function(err) {
@@ -13,51 +14,61 @@ var Sequelize = require('sequelize'),
 	console.log('Unable to connect to the database:', err);
 });*/
 
-User = User(dbConnection);
+var db = {};
+
+db.user = User(dbConnection);
 
 // seed user data
 
 // force: true will drop the table if it already exists
-User.sync({force: true}).then(function () {
+db.user.sync({force: true}).then(function () {
   // Table created
-  return User.create({
+  return db.user.create({
     name: 'Adam',
     email: 'a@b.com',
     password: '123'
   });
 });
 
-Survey = Survey(dbConnection);
+db.survey = Survey(dbConnection);
 
 //User.belongsToMany(Survey, {through: UserSurveys});
 
 //seed Survey
 
-Survey.sync({force: true}).then(function() {
-	return Survey.create({
+db.survey.sync({force: true}).then(function() {
+	return db.survey.create({
 		title: 'Sanity Check',
 		description: 'Are you insane?',
 		user_id: 1
 	});
 });
 
-Question = Question(dbConnection);
+db.question = Question(dbConnection);
 
 //Question.belongsTo(Survey);
 
-Question.sync({force: true}).then(function() {
-	return Question.create({
+db.question.sync({force: true}).then(function() {
+	return db.question.create({
 		text: 'This is not a question'
 	});
 });
 
-Answer = Answer(dbConnection);
+db.answer = Answer(dbConnection);
 
 //Answer.belongsTo(Question);
 
-Answer.sync({force: true}).then(function() {
-	return Answer.create({
+db.answer.sync({force: true}).then(function() {
+	return db.answer.create({
 		text: 'bad answer 1'
 	});
 });
+
+db.session = Session(dbConnection);
+
+db.session.sync({force: true}).then(function() {
+	console.log('set up sessions table');
+});
+
+module.exports = db;
 
