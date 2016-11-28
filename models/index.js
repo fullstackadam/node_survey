@@ -1,7 +1,6 @@
 var Sequelize = require('sequelize'),
 	dbConnection = require('../config/db'),
 	User = require('./user'),
-	Survey = require('./survey'),
 	Question = require('./question'),
 	Answer = require('./answer'),
 	Session = require('./session');
@@ -30,29 +29,20 @@ db.user.sync({force: true}).then(function () {
   });
 });
 
-db.survey = Survey(dbConnection);
-
-//User.belongsToMany(Survey, {through: UserSurveys});
-
-//seed Survey
-
-db.survey.sync({force: true}).then(function() {
-	return db.survey.create({
-		title: 'Sanity Check',
-		description: 'Are you insane?',
-		user_id: 1
-	});
-});
-
 db.question = Question(dbConnection);
-
-//Question.belongsTo(Survey);
 
 db.question.sync({force: true}).then(function() {
 	return db.question.create({
 		text: 'This is not a question'
 	});
 });
+
+//Who's the CEO of sumome
+//What industry is sumo me in
+//What's sumo me's score on glass door
+//What company did Noah Kagan join after leaving facebook?
+//What's the name of Noah kagan's $1000 per month entrepreneur course?
+//what's sumome's value proposition?
 
 db.answer = Answer(dbConnection);
 
