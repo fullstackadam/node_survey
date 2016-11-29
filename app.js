@@ -1,7 +1,8 @@
 var session = require('express-session'),
-	cookieParser = require('cookie-parser'),
+	connect = require('connect'),
+	//cookieParser = require('cookie-parser'),
 	dbConnection = require('./config/db'),
-	SequelizeStore = require('connect-session-sequelize')(session.Store),
+	//SequelizeStore = require('connect-session-sequelize')(session.Store),
 	express = require('express'),
 	authMiddleware = require('./middleware/authMiddleware'),
 	guestController = require('./controllers/guestController'),
@@ -11,16 +12,17 @@ var session = require('express-session'),
 var app = express();
 
 //if not logged in keep active for 14 days else 30 minutes
-app.use(cookieParser());
-/*app.use(session({
+//app.use(cookieParser());
+app.use(session({
   secret: 'keyboard cat',
   resave: false,
   saveUninitialized: true,
-  store: new SequelizeStore({
+  cookie: {secure: true}
+  /*store: new SequelizeStore({
   	db: dbConnection,
   	table: 'sessions'
-  })
-}));*/
+  })*/
+}));
 
 var port = process.env.PORT || 3000;
 
