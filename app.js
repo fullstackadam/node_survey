@@ -12,17 +12,15 @@ var app = express();
 
 //if not logged in keep active for 14 days else 30 minutes
 app.use(cookieParser());
-app.use(session({
+/*app.use(session({
   secret: 'keyboard cat',
   resave: false,
   saveUninitialized: true,
   store: new SequelizeStore({
   	db: dbConnection,
-  	table: 'session'
+  	table: 'sessions'
   })
-}));
-
-//SequelizeStore;
+}));*/
 
 var port = process.env.PORT || 3000;
 

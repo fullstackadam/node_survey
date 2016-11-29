@@ -1,16 +1,21 @@
 module.exports = function(dbConnection, Sequelize) {
 
-	return dbConnection.define('answer', {
+	return dbConnection.define('answered_question', {
+		session_id: {
+			type: Sequelize.INTEGER,
+			notNull: true,
+			notEmpty: true
+		},
 		question_id: {
 			type: Sequelize.INTEGER,
 			notNull: true,
 			notEmpty: true
 		},
-		text: {
-			type: Sequelize.STRING,
+		answer_id: {
+			type: Sequelize.INTEGER,
 			notNull: true,
 			notEmpty: true
 		}
 	});
-
+	
 };

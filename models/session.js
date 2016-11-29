@@ -1,6 +1,5 @@
-var Sequelize = require('sequelize');
 
-module.exports = function(dbConnection) {
+module.exports = function(dbConnection, Sequelize) {
 	return dbConnection.define('session', {
 		sid: {
 			type: Sequelize.STRING,
