@@ -1,10 +1,9 @@
-var Sequelize = require('sequelize');
-
-module.exports = function(dbConnection) {
+module.exports = function(dbConnection, Sequelize) {
 	return dbConnection.define('question', {
 		text: {
 			type: Sequelize.STRING,
-			notNull: true
+			notNull: true,
+			notEmpty: true
 		}
 	});
 };

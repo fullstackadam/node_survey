@@ -15,25 +15,25 @@
 <body>
 	<div class="container">
 		<div class="container">
+		
 			<table class="table">
 				<thead>
 					<tr>
-						<th>Name</th>
-						<th>Description</th>
-						<th>Questions</th>
+						<th>Question</th>
 						<th></th>
 					</tr>
 				</thead>
 				<tbody>
+					<% console.log(questions.answers) %>
+					<% for(i = 0;i < questions.length;i++) { %>
 					<tr>
-						<td>Survey 1</td>
-						<td>This is a super awesome survey about...</td>
-						<td>40</td>
+						<td><%= questions[i].text %></td>
 						<td>
 							<button class="btn">EDIT</button>
 							<button class="btn">DELETE</button>
 						</td>
 					</tr>
+					<% } %>
 				</tbody>
 			</table>
 		</div>
