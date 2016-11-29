@@ -2,7 +2,7 @@ module.exports = function(dbConnection, Sequelize) {
 
 	return dbConnection.define('answered_question', {
 		session_id: {
-			type: Sequelize.INTEGER,
+			type: Sequelize.STRING,
 			notNull: true,
 			notEmpty: true
 		},

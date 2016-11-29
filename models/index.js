@@ -5,7 +5,7 @@ var models = [
 	'user',
 	'question',
 	'answer',
-	'session',
+	//'session',
 	'answered_question'
 ];
 
@@ -18,6 +18,7 @@ dbConnection.query('SET FOREIGN_KEY_CHECKS = 0')
 		dbConnection.sync({force: true, logging: console.log}).then(function() {
 			(function(m) {
 				m.question.hasMany(m.answer, {as: 'Answers', foreignKey: 'question_id'});
+				//m.session.hasMany(m.answered_question, {as: 'Answers', foreignKey: 'session_id'});
 			})(module.exports);
 			seedData(module.exports);
 		});
