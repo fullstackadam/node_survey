@@ -3,18 +3,7 @@ var db = require('../models');
 module.exports = function(app) {
   app.get('/', function(req, res) {
     
-    //avoid already answered questions
-    var answers = [
-    	'one',
-    	'two',
-    	'forty',
-    	'fifty-five',
-    	'I can\'t count'
-    ];
-
-
-
-    //get random survey question
+    console.log(req.session.id);
 
     //get count
     
@@ -24,8 +13,10 @@ module.exports = function(app) {
     	console.log('There are '+c+' questions');
     	return c;
     }).then(function(c) {
-    	
-    	//id = rand 1 -> count
+    	//get random survey question
+		
+		//avoid already answered questions
+		
 		//aq_arr query answered_question
 
 		//while rand id in answered questions
@@ -33,7 +24,9 @@ module.exports = function(app) {
     	
     	return id;
     }).then(function(id) {
+    	
     	console.log(id);
+
     	db.question.findById(id)
 	    	.then(function(question) {
 		    	var answers = question.getAnswers();
@@ -45,8 +38,26 @@ module.exports = function(app) {
 		    	});
 	    	});
 
-
     });
     
   });
+
+  app.post('/answer_question', function(req, res) {
+  		var question_id = req.param('question'),
+  			answer_id = req.param('answer'),
+  			session_id = req.session.id;
+
+  		// save answer if not already answered
+		db.answered_question.findOrCreate({
+			where: {
+				session_id: session_id,
+				question_id: question_id
+			},
+			defaults: {
+				answer_id: answer_id
+			}
+		});
+		res.redirect('/');
+  });
+
 };
