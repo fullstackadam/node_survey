@@ -1,44 +1,68 @@
-var db = require('../models');
+var db = require('../config/db'),
+	{question, answer, session} = require('../models'),
+	shuffle = require('shuffle-array');
 
 module.exports = function(app) {
   app.get('/', function(req, res) {
-    
-    console.log(req.session.id);
 
     //get count
     
-    var c = db.question.count().then(function(c) {
-    	return c;
-    }).then(function(c) {
-    	console.log('There are '+c+' questions');
-    	return c;
-    }).then(function(c) {
-    	//get random survey question
-		
-		//avoid already answered questions
-		
-		//aq_arr query answered_question
+    question.count()
+	    .then(function(c) {
+			// find ids of questions not answered
+			// where question.id = answer.question_id
 
-		//while rand id in answered questions
-    	id = Math.floor(Math.random() * (c - 1 + 1)) + 1;
-    	
-    	return id;
-    }).then(function(id) {
-    	
-    	console.log(id);
+			/*
+				select * from questions 
+				left join answers 
+				on questions.id = answers.question_id 
+				where question_id IS NULL;
+			*/
 
-    	db.question.findById(id)
-	    	.then(function(question) {
-		    	var answers = question.getAnswers();
-		    	answers.then(function(answers) {
-					res.render('guest/index', { 
-						question: question,
-						answers: answers
-					});
-		    	});
-	    	});
+			var q = 'select *,questions.id from questions \
+				left join answers \
+				on questions.id = answers.question_id \
+				where question_id IS NULL';
 
-    });
+			return db.query(q);
+	    })
+		.then(function(answers) {
+			var availableQuestions = [];
+			
+			answers[0].forEach(function(answer) {
+				availableQuestions.push(answer.id);
+			});
+
+
+			if(availableQuestions.length === 0) {
+				throw new Error('Out of questions');
+			}
+			
+			// shuffle array
+			shuffle(availableQuestions);
+	    	
+	    	var id = availableQuestions.pop();
+
+	    	return question.findById(id);
+		})
+    	.then(function(question) {
+    		return question.getChoices()
+    			.then(choices => {
+    				//console.log(choices);
+    				return {question: question, choices: choices};
+    			});
+		})
+		.then(function(data) {
+			//console.log(data);
+			res.render('guest/index', { 
+				question: data.question,
+				choices: data.choices
+			});
+		})
+		.catch(e => {
+			console.log(e.message);
+			res.render('guest/outOfQuestions');
+		});
     
   });
 
@@ -48,16 +72,34 @@ module.exports = function(app) {
   			session_id = req.session.id;
 
   		// save answer if not already answered
-		db.answered_question.findOrCreate({
+		answer.findOrCreate({
 			where: {
 				session_id: session_id,
 				question_id: question_id
 			},
 			defaults: {
-				answer_id: answer_id
+				choice_id: answer_id
 			}
+		})
+		.then(function() {
+			res.redirect('/');
+		})
+		.catch(e => {
+			console.log(e);
+			res.send(e.message);
 		});
-		res.redirect('/');
+
+		session.findOne({where: {sid: session_id}})
+			.then(function(session) {
+				return session.getAnswers();
+			})					
+			.then(function(answers){
+				answers.forEach(function(answer) {
+					console.log(answer.getChoice().then().done());
+				});
+			});
+
+		
   });
 
 };
