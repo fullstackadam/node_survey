@@ -1,113 +1,164 @@
 var Sequelize = require('sequelize'),
-	dbConnection = require('../config/db');
+	dbConnection = require('../config/db'),
+	seedData = require('./seedData'),
+	foreignKeyConstraints = true;
 
-var models = [
-	'user',
-	'question',
-	'answer',
-	//'session',
-	'answered_question'
-];
+// models
 
-models.forEach(function(model) {
-	module.exports[model] = dbConnection.import(__dirname + '/' + model);
+var user = dbConnection.define('user', {
+	name: {
+		type: Sequelize.STRING,
+		allowNull: false,
+		validate: {
+			notEmpty: true,
+			isAlphanumeric: true
+		}
+	},
+	email: {
+		type: Sequelize.STRING,
+		allowNull: false,
+		validate: {
+			notEmpty: true,
+			isEmail: true
+		}
+	},
+	password: {
+		type: Sequelize.STRING,
+		allowNull: false,
+		validate: {
+			notEmpty: true
+		}
+	} // encrypted
 });
 
-dbConnection.query('SET FOREIGN_KEY_CHECKS = 0')
-	.then(function() {
-		dbConnection.sync({force: true, logging: console.log}).then(function() {
-			(function(m) {
-				m.question.hasMany(m.answer, {as: 'Answers', foreignKey: 'question_id'});
-				//m.session.hasMany(m.answered_question, {as: 'Answers', foreignKey: 'session_id'});
-			})(module.exports);
-			seedData(module.exports);
-		});
-	})
-	.catch(function(error) {
-		console.log(error);
-	});
+var question = dbConnection.define('question', {
+	text: {
+		type: Sequelize.STRING,
+		allowNull: false,
+		validate: {
+			notEmpty: true
+		}
+	}
+});
 
+var choice = dbConnection.define('choice', {
+	question_id: {
+		type: Sequelize.INTEGER,
+		allowNull: false,
+		validate: {
+			notEmpty: true
+		}
+	},
+	text: {
+		type: Sequelize.STRING,
+		allowNull: false,
+		validate: {
+			notEmpty: true
+		}
+	}
+});
 
-	/*.then(function() {
-		//seedData(module.exports);
-	})
-	.then(function() {
-		module.exports.question.findOne()
-			.then(function(question) {
-				//question.getAnswers().then(function(answers) {
-					//console.log(answers);
-					//answers.forEach(function(answer) {
-					//	console.log(answer.text);
-					//});
-				//});
-				//var answer = module.exports.answer.build({text:'addAnswer 22 created'}).save();
+var answer = dbConnection.define('answer', {
+	session_id: {
+		type: Sequelize.STRING,
+		allowNull: false,
+		validate: {
+			notEmpty: true
+		}
+	},
+	question_id: {
+		type: Sequelize.INTEGER,
+		allowNull: false,
+		validate: {
+			notEmpty: true
+		}
+	},
+	choice_id: {
+		type: Sequelize.INTEGER,
+		allowNull: false,
+		validate: {
+			notEmpty: true
+		}
+	}
+});
 
-				//console.log(answer);
-				//question.setAnswers(answer);
-				//question.save();
-			});
-	});*/
+var session = dbConnection.define('session', {
+	sid: {
+		type: Sequelize.STRING,
+		primaryKey: true
+	},
+	userId: Sequelize.STRING,
+	expires: Sequelize.DATE,
+	data: Sequelize.STRING(50000)
+});
 
-// seed user data
+// associations
 
-var seedData = function(m) {
-	m.user.create({
-		name: 'Adam',
-		email: 'a@b.com',
-		password: '123'
-	});
+question.hasMany(choice, {
+	as: 'Choices',
+	foreignKey: 'question_id',
+	constraints: foreignKeyConstraints
+});
 
-	m.question.bulkCreate([/*{
-		text: 'Who\'s the CEO of SumoMe?'
-	}, {
-		text: 'What industry is SumoMe in?'
-	}, {
-		text: 'What\'s SumoMe\'s score on Glassdoor?'
-	}, {
-		text: 'What company did Noah Kagan join after leaving facebook?'
-	}, {
-		text: 'What\'s the name of Noah Kagan\'s $1000 per month entrepreneur course?'
-	}, {
-		text: 'What\'s SumoMe\'s value proposition?'
-	}, */{
-		text: 'How do you feel about the election outcome?'
-	}, {
-		text: 'How do you feel about growth hacking?'
-	}]);
+choice.belongsTo(question, {
+	foreignKey: 'question_id',
+	constraints: foreignKeyConstraints
+});
 
-	m.answer.bulkCreate([/*{
-		question_id: 1,
-		text: 'Mark Zuckerberg'
-	}, {
-		question_id: 1,
-		text: 'Bill Gates'
-	}, {
-		question_id: 1,
+question.hasMany(choice, {
+	as: 'Choices',
+	foreignKey: 'question_id',
+	constraints: foreignKeyConstraints
+});
 
-	}*/{
-		question_id: 1,
-		text: 'I\'m ready for America to be great again'
-	}, {
-		question_id: 1,
-		text: 'Can\'t wait for Obamacare to disappear'
-	}, {
-		question_id: 1,
-		text: 'Meh, I didn\'t vote'
-	}, {
-		question_id: 1,
-		text: 'I\'m ready to leave the country'
-	}, {
-		question_id: 1,
-		text: 'I\'m ready to leave the planet'
-	}, {
-		question_id: 2,
-		text: 'It\'s awesome. Can\'t wait to get rich'
-	}, {
-		question_id: 2,
-		text: 'Meh. It\'s nothing new'
-	}, {
-		question_id: 2,
-		text: 'Bah. It\'s modern snakeoil.'
-	}]);
+choice.belongsTo(question, {
+	foreignKey: 'question_id',
+	constraints: foreignKeyConstraints
+});
+
+session.hasMany(answer, {
+	as: 'Answers',
+	foreignKey: 'session_id', 
+	targetkey: 'sid',
+	constraints: foreignKeyConstraints
+});
+
+answer.belongsTo(session, {
+	foreignKey: 'session_id', 
+	targetkey: 'sid',
+	constraints: foreignKeyConstraints
+});
+
+answer.hasOne(choice, {
+	as: 'Choice',
+	foreignKey: 'choice_id',
+	constraints: foreignKeyConstraints
+});
+
+choice.belongsTo(answer, {
+	foreignKey: 'choice_id',
+	constraints: foreignKeyConstraints
+});
+
+var models = {
+	user: user,
+	question: question,
+	choice: choice,
+	answer: answer,
+	session: session
 };
 
+// set up tables and seed data
+
+dbConnection.authenticate()
+	.then(function() {
+		return dbConnection.sync({force: true, logging: console.log});
+	})
+	.then(function() {
+		seedData(module.exports);
+	})
+	.catch(function() {
+		console.log('dbConnection failed');
+	});
+
+module.exports = models;

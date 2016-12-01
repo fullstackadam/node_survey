@@ -1,21 +1,36 @@
 var session = require('express-session'),
 	cookieParser = require('cookie-parser'),
+	bodyParser = require('body-parser'),
 	dbConnection = require('./config/db'), // Sequelize
 	SequelizeStore = require('connect-session-sequelize')(session.Store),
 	express = require('express'),
 	authMiddleware = require('./middleware/authMiddleware'),
 	guestController = require('./controllers/guestController'),
-	adminController = require('./controllers/adminController'),
-	models = require('./models');
-
+	adminController = require('./controllers/adminController');
+	
 var app = express();
 
-//if not logged in keep active for 14 days else 30 minutes
+app.use( bodyParser.json() );       // to support JSON-encoded bodies
+app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
+  extended: true
+}));
+
+
 app.use(cookieParser());
+
+//keep guest sessions for 14 days 
+//keep admin sessions for 30 minutes
+
+var twoWeeks = 1000 * 60 * 60 * 24 * 14;
+var thirtyMinutes = 1000 * 60 * 30;
+
 app.use(session({
   secret: 'keyboard cat',
   store: new SequelizeStore({
-  	db: dbConnection
+  	db: dbConnection,
+  	table: 'session',
+  	checkExpirationInterval: thirtyMinutes,
+  	expiration: twoWeeks
   })
 }));
 
