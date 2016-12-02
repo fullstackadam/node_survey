@@ -1,6 +1,5 @@
 module.exports = function(app) {
   //answer
-
   app.get('/admin/answer', function(req, res) {
 
   });
