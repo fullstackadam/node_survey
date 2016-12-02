@@ -154,10 +154,11 @@ dbConnection.authenticate()
 	.then(function() {
 		return dbConnection.sync({force: true, logging: console.log});
 	})
-	.then(function() {
+	.then(() => {
 		seedData(module.exports);
 	})
-	.catch(function() {
+	.catch(e => {
+		console.log(e);
 		console.log('dbConnection failed');
 	});
 

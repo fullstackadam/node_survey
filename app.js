@@ -6,8 +6,9 @@ var session = require('express-session'),
 	express = require('express'),
 	authMiddleware = require('./middleware/authMiddleware'),
 	guestController = require('./controllers/guestController'),
-	adminController = require('./controllers/adminController');
-	
+	adminController = require('./controllers/adminController'),
+	questionController = require('./controllers/questionController');
+	//csrf token library
 var app = express();
 
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
@@ -40,6 +41,7 @@ authMiddleware(app);
 
 guestController(app);
 adminController(app);
+questionController(app);
 
 app.set('views', './views');
 app.set('view engine', 'ejs');
