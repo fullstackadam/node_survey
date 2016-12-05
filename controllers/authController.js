@@ -1,4 +1,4 @@
-module.exports = function(app) {
+export default (app) => {
 	app.post('/login', function() {
 		User.findOne({ email: req.body.email }, function(err, user) {
 			if (!user) {

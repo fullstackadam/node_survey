@@ -1,4 +1,4 @@
-module.exports = function(req, res, next) {
+export default (req, res, next) => {
 		if (!req.session.admin) {
 			console.log('fail--');
 			

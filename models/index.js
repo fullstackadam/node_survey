@@ -1,11 +1,12 @@
-var Sequelize = require('sequelize'),
-	dbConnection = require('../config/db'),
-	seedData = require('./seedData'),
-	foreignKeyConstraints = true;
+import Sequelize from 'sequelize';
+import dbConnection from '../config/db';
+import seedData from './seedData';
+
+const foreignKeyConstraints = true;
 
 // models
 
-var user = dbConnection.define('user', {
+const user = dbConnection.define('user', {
 	name: {
 		type: Sequelize.STRING,
 		allowNull: false,
@@ -31,7 +32,7 @@ var user = dbConnection.define('user', {
 	} // encrypted
 });
 
-var question = dbConnection.define('question', {
+const question = dbConnection.define('question', {
 	text: {
 		type: Sequelize.STRING,
 		allowNull: false,
@@ -41,7 +42,7 @@ var question = dbConnection.define('question', {
 	}
 });
 
-var choice = dbConnection.define('choice', {
+const choice = dbConnection.define('choice', {
 	question_id: {
 		type: Sequelize.INTEGER,
 		allowNull: false,
@@ -58,7 +59,7 @@ var choice = dbConnection.define('choice', {
 	}
 });
 
-var answer = dbConnection.define('answer', {
+const answer = dbConnection.define('answer', {
 	session_id: {
 		type: Sequelize.STRING,
 		allowNull: false,
@@ -82,7 +83,7 @@ var answer = dbConnection.define('answer', {
 	}
 });
 
-var session = dbConnection.define('session', {
+const session = dbConnection.define('session', {
 	sid: {
 		type: Sequelize.STRING,
 		primaryKey: true
@@ -118,13 +119,13 @@ choice.belongsTo(question, {
 
 session.hasMany(answer, {
 	as: 'Answers',
-	foreignKey: 'session_id', 
+	foreignKey: 'session_id',
 	targetkey: 'sid',
 	constraints: foreignKeyConstraints
 });
 
 answer.belongsTo(session, {
-	foreignKey: 'session_id', 
+	foreignKey: 'session_id',
 	targetkey: 'sid',
 	constraints: foreignKeyConstraints
 });
@@ -140,7 +141,7 @@ choice.belongsTo(answer, {
 	constraints: foreignKeyConstraints
 });
 
-var models = {
+const models = {
 	user: user,
 	question: question,
 	choice: choice,
@@ -151,7 +152,7 @@ var models = {
 // set up tables and seed data
 
 dbConnection.authenticate()
-	.then(function() {
+	.then(() => {
 		return dbConnection.sync({force: true, logging: console.log});
 	})
 	.then(() => {
@@ -162,4 +163,4 @@ dbConnection.authenticate()
 		console.log('dbConnection failed');
 	});
 
-module.exports = models;
+export default models;

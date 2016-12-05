@@ -1,12 +1,12 @@
-var {question} = require('../models'),
-	requireLogin = require('../middleware/authMiddleware');
+import {question} from '../models';
+import requireLogin from '../middleware/authMiddleware';
 
-module.exports = function(app) {
-	app.get('/question', requireLogin, function(req, res) {
+export default (app) => {
+	app.get('/question', requireLogin, (req, res) => {
 		res.send('nothing here :)');
 	});
 
-	app.post('/question', requireLogin, function(req, res) {
+	app.post('/question', requireLogin, (req, res) => {
 		question.create({
 			text: req.body.text
 		})
@@ -15,7 +15,7 @@ module.exports = function(app) {
 		});
 	});
 
-	app.put('/question/:id', requireLogin, function(req, res) {
+	app.put('/question/:id', requireLogin, (req, res) => {
 		question.update({
 			text: req.body.text
 		}, {
@@ -31,7 +31,7 @@ module.exports = function(app) {
 		});
 	});
 
-	app.delete('/question/:id', requireLogin, function(req, res) {
+	app.delete('/question/:id', requireLogin, (req, res) => {
 		var d = question.destroy({where: {id: req.params.id}})
 			.return(d);
 		

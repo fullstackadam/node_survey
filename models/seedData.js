@@ -1,4 +1,4 @@
-module.exports = function(m) {
+export default (m) => {
 	m.user.create({
 		name: 'Adam',
 		email: 'a@b.com',
