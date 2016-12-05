@@ -1,38 +1,20 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<title>Admin Area</title>
-
-<!-- Latest compiled and minified CSS -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-
-<!-- Optional theme -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-
-<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-
-<!-- Latest compiled and minified JavaScript -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-</head>
-<body>
+<% include ../../layout/header %>
 	<div class="container">
 		<div class="row">
 			<div class="col-sm-offset-1 col-md-offset-1 col-lg-offset-1 col-sm-10 col-md-10 col-lg-10">
 			<table class="table table-responsive">
 				<tbody>
-					<% console.log(questions.answers) %>
-					<% for(i = 0;i < questions.length;i++) { %>
+					<% questions.forEach(function(question) { %>
 					<tr>
-						<td><%= questions[i].text %></td>
+						<td><%= question.text %></td>
 						<td>
-							<a href="/admin/question/edit/<%= questions[i].id %>">
+							<a href="/admin/question/edit/<%= question.id %>">
 								<button class="btn btn-warning">EDIT</button>
 							</a>
-							<button class="btn btn-danger delete" question-id="<%= questions[i].id %>">DELETE</button>
+							<button class="btn btn-danger delete" question-id="<%= question.id %>">DELETE</button>
 						</td>
 					</tr>
-					<% } %>
+					<% }) %>
 					<tr>
 						<td colspan="2">
 							<a href="/admin/question/add">
@@ -80,5 +62,4 @@
 			});
 		});
 	</script>
-</body>
-</html>
+<% include ../../layout/footer %>
