@@ -1,4 +1,6 @@
-import {choice, question, user} from '../models';
+import models from '../models';
+const {choice, question, user} = models;
+import crypto from 'crypto';
 import requireLogin from '../middleware/authMiddleware';
 
 export default (app) => {
@@ -10,7 +12,8 @@ export default (app) => {
 			if (!user) {
 				//flash message 'Invalid email or password.'
 			} else {
-				if (req.body.password === user.password) {
+				const hash = crypto.pbkdf2Sync(req.body.password, user.salt, 1000, 64).toString('hex');
+				if (hash === user.hash) {
 					req.session.admin = true;
 					console.log(req.session);
 					res.redirect('/admin');

@@ -1,5 +1,6 @@
 import db from '../config/db';
-import {question, answer, session} from '../models';
+import models from '../models';
+const {question, answer, session} = models;
 import shuffle from 'shuffle-array';
 
 export default (app) => {

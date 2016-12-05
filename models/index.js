@@ -23,7 +23,14 @@ const user = dbConnection.define('user', {
 			isEmail: true
 		}
 	},
-	password: {
+	hash: {
+		type: Sequelize.STRING,
+		allowNull: false,
+		validate: {
+			notEmpty: true
+		}
+	}, // encrypted
+	salt: {
 		type: Sequelize.STRING,
 		allowNull: false,
 		validate: {
@@ -156,7 +163,7 @@ dbConnection.authenticate()
 		return dbConnection.sync({force: true, logging: console.log});
 	})
 	.then(() => {
-		seedData(module.exports);
+		seedData(models);
 	})
 	.catch(e => {
 		console.log(e);

@@ -1,11 +1,9 @@
-const Sequelize = require('sequelize'),
-	pathMod = require('path'),
-	envMod = require('environment-vars'),
-	path = pathMod.join(__dirname, '../'),
-	env = envMod(path, '.env');
+import Sequelize from 'sequelize';
+import general from './general';
+const {DATABASE, DB_USER, DB_PASS, DB_HOST} = general;
 
-export default new Sequelize(env.get('DATABASE'), env.get('USERNAME'), env.get('PASSWORD'), {
-	host: env.get('HOST'),
+export default new Sequelize(DATABASE, DB_USER, DB_PASS, {
+	host: DB_HOST,
 	dialect: 'mysql',
 	pool: {
 		max: 5,
