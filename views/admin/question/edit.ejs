@@ -2,11 +2,19 @@
 	<div class="container">
 		<div class="row">
 			<div class="col-sm-offset-1 col-md-offset-1 col-lg-offset-1 col-sm-10 col-md-10 col-lg-10">
-				<form method="PUT" action="/question/<%= question.id %>">
+				<form>
 					<div class="form-group">
 						<label>Question</label>
-						<input type="hidden" name="">
 						<input name="text" type="text" class="form-control" value="<%= question.text %>">
+					</div>
+					<% choices.forEach(function(choice) { %>
+					<div class="form-group">
+						<label style="float: left; width: 50%;">Choice </label>
+						<input name="choices[]" choice-id="<%= choice.id %>" style="width: 50%;" type="text" class="form-control" value="<%= choice.text %>">
+					</div>
+					<% }) %>
+					<div class="form-group">
+						<button id="add-choice" type="button" class="btn btn-block btn-success pull-right" style="width: 50%;">ADD CHOICE</button>
 					</div>
 					<div class="form-group">
 						<button type="submit" class="btn btn-block btn-success">SAVE</button>
@@ -17,18 +25,80 @@
 	</div>
 	<script>
 		$(function() {
+
+			var choices = {"choices": []};
+
+			//add initial choices
+			(function(c) {
+				var id,
+					text;
+				$('[name="choices[]"]').each(function(key, val) {
+					id = $(val).attr('choice-id');
+					text = $(val).attr('value');
+
+					c.choices.push({
+						id: id,
+						text: text
+					});
+					console.log(choices);
+				});
+			})(choices);
+
 			$('form').submit(function(e) {
 				e.preventDefault();
 				e.stopPropagation();
-				
+
+				save();
+				//redirect();
+			});
+
+			var saveQuestion = function() {
 				$.ajax({
 					url: '/question/<%= question.id %>',
 					method: 'PUT',
+					async: false,
 					data: 'text='+encodeURIComponent($('[name=text]').val())
-				}).done(function() {
-					window.location="/admin";
-				})
+				});
+			}
+
+			var saveChoices = function() {
+				$.ajax({
+					url: '/choice',
+					method: 'POST',
+					dataType: 'json',
+					data: JSON.stringify(choices),
+					async: false
+				});
+			}
+
+			var save = function() {
+				saveQuestion();
+				saveChoices();
+			}
+
+			var redirect = function() {
+				window.location="/admin";
+			}
+
+
+			$("#add-choice").click(function() {
+				$('.form-group:nth(1)')
+					.clone(true)
+					.insertAfter('.form-group:nth(-3)')
+					.find('input')
+					.attr('choice-id','new')
+					.attr('value','');
+				logChoices();
+				return false;
 			});
+
+			function logChoices() {
+				$('[name="choices[]"]').each(function(key, val) {
+					console.log($(val).attr('choice-id'));
+				});
+			}
+
+			logChoices();
 		});
 	</script>
 <% include ../../layout/footer %>
