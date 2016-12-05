@@ -1,14 +1,14 @@
-var db = require('../config/db'),
-	{question, answer, session} = require('../models'),
-	shuffle = require('shuffle-array');
+import db from '../config/db';
+import {question, answer, session} from '../models';
+import shuffle from 'shuffle-array';
 
-module.exports = function(app) {
-  app.get('/', function(req, res) {
+export default (app) => {
+  app.get('/', (req, res) => {
 
     //get count
     
     question.count()
-	    .then(function(c) {
+	    .then((c) => {
 			// find ids of questions not answered
 			// where question.id = answer.question_id
 
@@ -19,17 +19,17 @@ module.exports = function(app) {
 				where question_id IS NULL;
 			*/
 
-			var q = 'select *,questions.id from questions \
+			const q = 'select *,questions.id from questions \
 				left join answers \
 				on questions.id = answers.question_id \
 				where question_id IS NULL';
 
 			return db.query(q);
 	    })
-		.then(function(answers) {
+		.then((answers) => {
 			var availableQuestions = [];
 			
-			answers[0].forEach(function(answer) {
+			answers[0].forEach((answer) => {
 				availableQuestions.push(answer.id);
 			});
 
@@ -41,18 +41,18 @@ module.exports = function(app) {
 			// shuffle array
 			shuffle(availableQuestions);
 	    	
-	    	var id = availableQuestions.pop();
+	    	const id = availableQuestions.pop();
 
 	    	return question.findById(id);
 		})
-    	.then(function(question) {
+    	.then((question) => {
     		return question.getChoices()
     			.then(choices => {
     				//console.log(choices);
     				return {question: question, choices: choices};
     			});
 		})
-		.then(function(data) {
+		.then((data) => {
 			//console.log(data);
 			res.render('guest/index', { 
 				question: data.question,
@@ -66,8 +66,8 @@ module.exports = function(app) {
     
   });
 
-  app.post('/answer_question', function(req, res) {
-  		var question_id = req.param('question'),
+  app.post('/answer_question', (req, res) => {
+  		const question_id = req.param('question'),
   			answer_id = req.param('answer'),
   			session_id = req.session.id;
 
@@ -81,7 +81,7 @@ module.exports = function(app) {
 				choice_id: answer_id
 			}
 		})
-		.then(function() {
+		.then(() => {
 			res.redirect('/');
 		})
 		.catch(e => {
@@ -90,11 +90,11 @@ module.exports = function(app) {
 		});
 
 		session.findOne({where: {sid: session_id}})
-			.then(function(session) {
+			.then((session) => {
 				return session.getAnswers();
 			})					
-			.then(function(answers){
-				answers.forEach(function(answer) {
+			.then((answers) => {
+				answers.forEach((answer) => {
 					console.log(answer.getChoice().then().done());
 				});
 			});
