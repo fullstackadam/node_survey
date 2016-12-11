@@ -3,11 +3,11 @@ import general from '../config/general';
 const {ADMIN_NAME, ADMIN_EMAIL, ADMIN_PASSWORD} = general,
 	salt = crypto.randomBytes(16).toString('hex');
 
-export default (m) => {
+export default m => {
 	m.user.create({
 		name: ADMIN_NAME,
 		email: ADMIN_EMAIL,
-		hash: (function(password){
+		hash: (password => {
 		  	var hash = crypto.pbkdf2Sync(password, salt, 1000, 64).toString('hex');
 		  return hash;
 		})(ADMIN_PASSWORD),

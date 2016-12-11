@@ -1,7 +1,9 @@
-import {choice} from '../models';
+import models from '../models';
+const {choice} = models;
 import requireLogin from '../middleware/authMiddleware';
+import parser from '../config/parser';
 
-export default (app) => {
+export default app => {
 
 	//answer
 	app.get('/choice', requireLogin, (req, res) => {
@@ -9,28 +11,46 @@ export default (app) => {
 	});
 
   
-	app.post('/choice', requireLogin, (req, res) => {
-		console.log(req.body);
+	app.post('/choice', requireLogin, parser.json, (req, res) => {
 
-		/*req.body.choices.forEach(function(thing) {
-			console.log(thing);
-		});*/
+		var addedChoices = {"choices": []};
 
+		req.body.choices.forEach(choice_item => {
+
+			var choice_obj = {
+				question_id: choice_item.question_id,
+				text: choice_item.text
+			};
+
+			// if not new choice add id to choice object
+
+			if(choice_item.id !== 'new') {
+				choice_obj.id = choice_item.id;
+			}
+
+			choice.upsert(choice_obj)
+			.then(d => {
+				console.log(d);
+			});
+		});
+		
 		res.send('');
 
-		/*choice.create({
-			text: req.body.text
-		})
-		.then(() => {
+
+		/*.then(() => {
 			res.redirect('/admin');
 		});*/
 	});
 
-	app.put('/choice', requireLogin, (req, res) => {
+	app.put('/choice/:id', requireLogin, parser.json, (req, res) => {
 
 	});
 
-	app.delete('/choice', requireLogin, (req, res) => {
-
+	app.delete('/choice/:id', requireLogin, parser.url, (req, res) => {
+		choice.destroy({where: {id: req.params.id}})
+			.then(d => {
+				console.log(d);
+			});
+		res.send('');
 	});
 };

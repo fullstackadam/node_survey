@@ -4,17 +4,23 @@
 			<div class="col-sm-offset-1 col-md-offset-1 col-lg-offset-1 col-sm-10 col-md-10 col-lg-10">
 				<form>
 					<div class="form-group">
-						<label>Question</label>
-						<input name="text" type="text" class="form-control" value="<%= question.text %>">
+						<h1>Question</h1>
+						<input name="text" question-id="<%= question.id %>" type="text" class="form-control" value="<%= question.text %>">
 					</div>
+					<h1>Choices</h1>
+					<% if(choices.length === 0) { %>
+					<% var choice = {"id": "new", "text": ""}; %>
+					<% var choices = [choice, choice]; %>
+					<% } %> 
 					<% choices.forEach(function(choice) { %>
 					<div class="form-group">
-						<label style="float: left; width: 50%;">Choice </label>
-						<input name="choices[]" choice-id="<%= choice.id %>" style="width: 50%;" type="text" class="form-control" value="<%= choice.text %>">
+						<input name="choices[]" choice-id="<%= choice.id %>" style="width: 80%; display: inline-block;" type="text" class="form-control" value="<%= choice.text %>">
+						<button type="button" class="btn btn-danger delete" style="display: inline-block; width: 18%;">DELETE</button>
 					</div>
 					<% }) %>
+					
 					<div class="form-group">
-						<button id="add-choice" type="button" class="btn btn-block btn-success pull-right" style="width: 50%;">ADD CHOICE</button>
+						<button id="add-choice" type="button" class="btn btn-block btn-info">ADD CHOICE</button>
 					</div>
 					<div class="form-group">
 						<button type="submit" class="btn btn-block btn-success">SAVE</button>
@@ -26,30 +32,13 @@
 	<script>
 		$(function() {
 
-			var choices = {"choices": []};
-
-			//add initial choices
-			(function(c) {
-				var id,
-					text;
-				$('[name="choices[]"]').each(function(key, val) {
-					id = $(val).attr('choice-id');
-					text = $(val).attr('value');
-
-					c.choices.push({
-						id: id,
-						text: text
-					});
-					console.log(choices);
-				});
-			})(choices);
-
 			$('form').submit(function(e) {
 				e.preventDefault();
 				e.stopPropagation();
 
 				save();
-				//redirect();
+
+				redirect();
 			});
 
 			var saveQuestion = function() {
@@ -59,26 +48,52 @@
 					async: false,
 					data: 'text='+encodeURIComponent($('[name=text]').val())
 				});
-			}
+			};
 
 			var saveChoices = function() {
+				var choices = {"choices": []},
+					questionId = $('[name=text]').attr('question-id'),
+					id,
+					text;
+
+				$('[name="choices[]"]').each(function(key, val) {
+					
+					id = $(val).attr('choice-id');
+					text = $(val).val();
+					if(text === '') {
+						//$(val).parent().remove();
+						return true;
+					}
+
+					choices.choices.push({
+						id: id,
+						question_id: questionId,
+						text: text
+					});
+
+					console.log(choices);
+				});
+
+				// update choice-id after saving
+
 				$.ajax({
 					url: '/choice',
 					method: 'POST',
 					dataType: 'json',
+					contentType: 'application/json; charset=utf-8',
 					data: JSON.stringify(choices),
 					async: false
 				});
-			}
+			};
 
 			var save = function() {
 				saveQuestion();
 				saveChoices();
-			}
+			};
 
 			var redirect = function() {
 				window.location="/admin";
-			}
+			};
 
 
 			$("#add-choice").click(function() {
@@ -88,15 +103,42 @@
 					.find('input')
 					.attr('choice-id','new')
 					.attr('value','');
+
 				logChoices();
 				return false;
 			});
 
-			function logChoices() {
+			var deleteChoice = function(id) {
+				$.ajax({
+					url: '/choice/'+id,
+					method: 'DELETE',
+				}).success(function() {
+					$('[choice-id='+id+']').parent().remove();
+				})
+			};
+
+			$('.delete').click(function() {
+
+				if($('[name="choices[]"]').length <= 2) {
+					console.log('Need at least 2 choices');
+					return false;
+				}
+
+				var id = $(this).prev().attr('choice-id');
+
+				if(id === 'new') {
+					$(this).parent().remove();
+				} else {
+					deleteChoice(id);
+					console.log('make request to delete choice');
+				}
+			});
+
+			var logChoices = function() {
 				$('[name="choices[]"]').each(function(key, val) {
 					console.log($(val).attr('choice-id'));
 				});
-			}
+			};
 
 			logChoices();
 		});

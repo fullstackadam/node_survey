@@ -2,14 +2,15 @@ import db from '../config/db';
 import models from '../models';
 const {question, answer, session} = models;
 import shuffle from 'shuffle-array';
+import parser from '../config/parser';
 
-export default (app) => {
+export default app => {
   app.get('/', (req, res) => {
 
     //get count
     
     question.count()
-	    .then((c) => {
+	    .then(c => {
 			// find ids of questions not answered
 			// where question.id = answer.question_id
 
@@ -27,10 +28,10 @@ export default (app) => {
 
 			return db.query(q);
 	    })
-		.then((answers) => {
+		.then(answers => {
 			var availableQuestions = [];
 			
-			answers[0].forEach((answer) => {
+			answers[0].forEach(answer => {
 				availableQuestions.push(answer.id);
 			});
 
@@ -46,14 +47,14 @@ export default (app) => {
 
 	    	return question.findById(id);
 		})
-    	.then((question) => {
+    	.then(question => {
     		return question.getChoices()
-    			.then(choices => {
-    				//console.log(choices);
-    				return {question: question, choices: choices};
-    			});
-		})
-		.then((data) => {
+					.then(choices => {
+						//console.log(choices);
+						return {question: question, choices: choices};
+					});
+		})    			
+		.then(d => {
 			//console.log(data);
 			res.render('guest/index', { 
 				question: data.question,
@@ -67,7 +68,7 @@ export default (app) => {
     
   });
 
-  app.post('/answer_question', (req, res) => {
+  app.post('/answer_question', parser.url, (req, res) => {
   		const question_id = req.param('question'),
   			answer_id = req.param('answer'),
   			session_id = req.session.id;
@@ -91,11 +92,11 @@ export default (app) => {
 		});
 
 		session.findOne({where: {sid: session_id}})
-			.then((session) => {
+			.then(session => {
 				return session.getAnswers();
 			})					
-			.then((answers) => {
-				answers.forEach((answer) => {
+			.then(answers => {
+				answers.forEach(answer => {
 					console.log(answer.getChoice().then().done());
 				});
 			});
