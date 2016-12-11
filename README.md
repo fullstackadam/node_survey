@@ -20,7 +20,7 @@ Create a mysql database
 ```
 mysql -u user -p
 create schema node_survey
-'''
+```
 Adjust the values in .env-example
 Rename the .env-example file to .env
 ```
