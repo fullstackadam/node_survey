@@ -34,9 +34,10 @@ export default app => {
 	});
 
 	app.delete('/question/:id', requireLogin, parser.url, (req, res) => {
-		var d = question.destroy({where: {id: req.params.id}})
-			.return(d);
-		
-		res.send(d);
+		console.log(req.params.id);
+		question.destroy({where: {id: req.params.id}})
+			.then(d => {
+				res.send('');
+			});
 	});
 };
