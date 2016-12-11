@@ -1,6 +1,5 @@
 import session from 'express-session';
 import cookieParser from 'cookie-parser';
-import bodyParser from 'body-parser';
 import dbConnection from './config/db'; // Sequelize
 const SequelizeStore = require('connect-session-sequelize')(session.Store);
 import express from 'express';
@@ -11,12 +10,6 @@ import choiceController from './controllers/choiceController';
 	//csrf token library
 
 const app = express();
-
-app.use(bodyParser.json({ type: 'application/*+json' }));       // to support JSON-encoded bodies
-app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
-	extended: true
-}));
-
 
 app.use(cookieParser());
 
