@@ -26,7 +26,11 @@ export default app => {
 	});
 
 	app.get('/login', (req, res) => {
-		res.render('admin/login');
+		const title = 'Login'
+
+		res.render('admin/login', {
+			title: title
+		});
 	});
 
 	app.get('/logout', requireLogin, (req, res) => {
@@ -35,9 +39,12 @@ export default app => {
 	});
 
 	app.get('/admin', requireLogin, (req, res) => {
+		const title = 'Questions';
+
 		question.findAll()
 		.then(questions => {
 			res.render('admin/index', {
+				title: title,
 				questions: questions
 			});
 		})
@@ -51,6 +58,8 @@ export default app => {
 		var foundQuestion,
 			choices;
 
+		const title = 'Edit Question';
+
 		question.findById(req.params.id)
 			.then(q => {
 				foundQuestion = q;
@@ -61,6 +70,7 @@ export default app => {
 			})
 			.then(choices => {
 				res.render('admin/question/edit', {
+					title: title,
 					question: foundQuestion,
 					choices: choices
 				});
@@ -73,6 +83,10 @@ export default app => {
 	});
 
 	app.get('/admin/question/add', requireLogin, (req, res) => {
-		res.render('admin/question/add');
+		const title = 'Add Question';
+
+		res.render('admin/question/add', {
+			title: title
+		});
 	});
 };
