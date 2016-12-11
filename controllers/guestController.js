@@ -7,33 +7,24 @@ import parser from '../config/parser';
 export default app => {
   app.get('/', (req, res) => {
 
-    //get count
-    
-    question.count()
-	    .then(c => {
-			// find ids of questions not answered
+  	//find unanswered questions
 
-			/*
-				select * from questions 
-				left join answers 
-				on questions.id = answers.question_id 
-				where question_id IS NULL;
-			*/
+	const q = 'select *,questions.id from questions ' +
+		'left join answers ' +
+		'on questions.id = answers.question_id ' +
+		'where question_id IS NULL';
 
-			const q = 'select *,questions.id from questions \
-				left join answers \
-				on questions.id = answers.question_id \
-				where question_id IS NULL';
-
-			return db.query(q);
-	    })
-		.then(answers => {
+    db.query(q)
+		.then(questions => {
+			console.log(questions);
 			var availableQuestions = [];
 			
-			answers[0].forEach(answer => {
-				availableQuestions.push(answer.id);
+			// put question ids into array
+			questions[0].forEach(question_item => {
+				availableQuestions.push(question_item.id);
 			});
-
+			console.log(availableQuestions);
+			// put question id's into array
 			if(availableQuestions.length === 0) {
 				throw new Error('Out of questions');
 			}
@@ -46,6 +37,7 @@ export default app => {
 	    	return question.findById(id);
 		})
     	.then(question => {
+    		console.log(question);
     		return question.getChoices()
 				.then(choices => {
 					return {question: question, choices: choices};

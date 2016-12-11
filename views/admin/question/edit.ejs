@@ -51,7 +51,7 @@
 			};
 
 			var saveChoices = function() {
-				var choices = {"choices": []},
+				var choices = {'choices': []},
 					questionId = $('[name=text]').attr('question-id'),
 					id,
 					text;
@@ -61,7 +61,6 @@
 					id = $(val).attr('choice-id');
 					text = $(val).val();
 					if(text === '') {
-						//$(val).parent().remove();
 						return true;
 					}
 
@@ -92,11 +91,11 @@
 			};
 
 			var redirect = function() {
-				window.location="/admin";
+				window.location='/admin';
 			};
 
 
-			$("#add-choice").click(function() {
+			$('#add-choice').click(function() {
 				$('.form-group:nth(1)')
 					.clone(true)
 					.insertAfter('.form-group:nth(-3)')
@@ -130,17 +129,8 @@
 					$(this).parent().remove();
 				} else {
 					deleteChoice(id);
-					console.log('make request to delete choice');
 				}
 			});
-
-			var logChoices = function() {
-				$('[name="choices[]"]').each(function(key, val) {
-					console.log($(val).attr('choice-id'));
-				});
-			};
-
-			logChoices();
 		});
 	</script>
 <% include ../../layout/footer %>

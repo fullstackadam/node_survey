@@ -5,7 +5,6 @@ import parser from '../config/parser';
 
 export default app => {
 
-	//answer
 	app.get('/choice', requireLogin, (req, res) => {
 
 	});
@@ -13,7 +12,7 @@ export default app => {
   
 	app.post('/choice', requireLogin, parser.json, (req, res) => {
 
-		var addedChoices = {"choices": []};
+		var addedChoices = {'choices': []};
 
 		req.body.choices.forEach(choice_item => {
 
@@ -35,11 +34,6 @@ export default app => {
 		});
 		
 		res.send('');
-
-
-		/*.then(() => {
-			res.redirect('/admin');
-		});*/
 	});
 
 	app.put('/choice/:id', requireLogin, parser.json, (req, res) => {
