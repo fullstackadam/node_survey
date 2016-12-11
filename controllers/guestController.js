@@ -12,7 +12,6 @@ export default app => {
     question.count()
 	    .then(c => {
 			// find ids of questions not answered
-			// where question.id = answer.question_id
 
 			/*
 				select * from questions 
@@ -35,11 +34,10 @@ export default app => {
 				availableQuestions.push(answer.id);
 			});
 
-
 			if(availableQuestions.length === 0) {
 				throw new Error('Out of questions');
 			}
-			
+
 			// shuffle array
 			shuffle(availableQuestions);
 	    	
@@ -49,21 +47,25 @@ export default app => {
 		})
     	.then(question => {
     		return question.getChoices()
-					.then(choices => {
-						//console.log(choices);
-						return {question: question, choices: choices};
-					});
+				.then(choices => {
+					return {question: question, choices: choices};
+				});
 		})    			
 		.then(d => {
-			//console.log(data);
+			const title = 'Random Question';
+
 			res.render('guest/index', { 
-				question: data.question,
-				choices: data.choices
+				title: title,
+				question: d.question,
+				choices: d.choices
 			});
 		})
 		.catch(e => {
-			console.log(e.message);
-			res.render('guest/outOfQuestions');
+			const title = 'Out of Questions';
+
+			res.render('guest/outOfQuestions', {
+				title: title
+			});
 		});
     
   });
@@ -90,18 +92,6 @@ export default app => {
 			console.log(e);
 			res.send(e.message);
 		});
-
-		session.findOne({where: {sid: session_id}})
-			.then(session => {
-				return session.getAnswers();
-			})					
-			.then(answers => {
-				answers.forEach(answer => {
-					console.log(answer.getChoice().then().done());
-				});
-			});
-
-		
   });
 
 };
