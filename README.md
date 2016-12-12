@@ -22,6 +22,18 @@ mysql -u user -p
 create schema node_survey
 ```
 Adjust the values in .env-example
+```
+DB_USER=root
+DB_PASS=password
+DB_HOST=localhost
+DATABASE=node_survey
+
+#admin
+ADMIN_NAME=Fiddy
+ADMIN_EMAIL=fiddy@gunit.com
+ADMIN_PASSWORD=50cent
+```
+
 Rename the .env-example file to .env
 ```
 mv .env-example .env
