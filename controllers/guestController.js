@@ -1,89 +1,80 @@
-import db from '../config/db';
-import models from '../models';
-const {question, answer, session} = models;
 import shuffle from 'shuffle-array';
+import models from '../models';
+import db from '../config/db';
 import parser from '../config/parser';
 
-export default app => {
+const { question, answer } = models;
+
+export default (app) => {
   app.get('/', (req, res) => {
+    // find unanswered questions
 
-  	//find unanswered questions
+    const sql = 'select *,questions.id from questions ' +
+      'left join answers ' +
+      'on questions.id = answers.question_id ' +
+      'where question_id IS NULL';
 
-	const q = 'select *,questions.id from questions ' +
-		'left join answers ' +
-		'on questions.id = answers.question_id ' +
-		'where question_id IS NULL';
+    db.query(sql)
+      .then((questions) => {
+        const availableQuestions = [];
 
-    db.query(q)
-		.then(questions => {
-			console.log(questions);
-			var availableQuestions = [];
-			
-			// put question ids into array
-			questions[0].forEach(question_item => {
-				availableQuestions.push(question_item.id);
-			});
-			console.log(availableQuestions);
-			// put question id's into array
-			if(availableQuestions.length === 0) {
-				throw new Error('Out of questions');
-			}
+        // put question ids into array
+        questions[0].forEach(questionItem => availableQuestions.push(questionItem.id));
 
-			// shuffle array
-			shuffle(availableQuestions);
-	    	
-	    	const id = availableQuestions.pop();
+        // put question id's into array
+        if (availableQuestions.length === 0) {
+          throw new Error('Out of questions');
+        }
 
-	    	return question.findById(id);
-		})
-    	.then(question => {
-    		console.log(question);
-    		return question.getChoices()
-				.then(choices => {
-					return {question: question, choices: choices};
-				});
-		})    			
-		.then(d => {
-			const title = 'Random Question';
+        // shuffle array
+        shuffle(availableQuestions);
 
-			res.render('guest/index', { 
-				title: title,
-				question: d.question,
-				choices: d.choices
-			});
-		})
-		.catch(e => {
-			const title = 'Out of Questions';
+        const id = availableQuestions.pop();
 
-			res.render('guest/outOfQuestions', {
-				title: title
-			});
-		});
-    
+        return question.findById(id);
+      })
+      .then((currentQuestion) => {
+        console.log(currentQuestion);
+        return currentQuestion.getChoices()
+          .then(choices => ({ question: currentQuestion, choices }));
+      })
+      .then((data) => {
+        const title = 'Random Question';
+
+        res.render('guest/index', {
+          title,
+          question: data.question,
+          choices: data.choices,
+        });
+      })
+      .catch(() => {
+        const title = 'Out of Questions';
+
+        res.render('guest/outOfQuestions', {
+          title,
+        });
+      });
   });
 
   app.post('/answer_question', parser.url, (req, res) => {
-  		const question_id = req.param('question'),
-  			answer_id = req.param('answer'),
-  			session_id = req.session.id;
+    const questionId = req.param('question');
+    const answerId = req.param('answer');
+    const sessionId = req.session.id;
 
-  		// save answer if not already answered
-		answer.findOrCreate({
-			where: {
-				session_id: session_id,
-				question_id: question_id
-			},
-			defaults: {
-				choice_id: answer_id
-			}
-		})
-		.then(() => {
-			res.redirect('/');
-		})
-		.catch(e => {
-			console.log(e);
-			res.send(e.message);
-		});
+    // save answer if not already answered
+    answer.findOrCreate({
+      where: {
+        session_id: sessionId,
+        question_id: questionId,
+      },
+      defaults: {
+        choice_id: answerId,
+      },
+    })
+    .then(() => res.redirect('/'))
+    .catch((error) => {
+      console.log(error);
+      res.send(error.message);
+    });
   });
-
 };

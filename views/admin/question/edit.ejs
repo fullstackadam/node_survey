@@ -9,13 +9,13 @@
 					</div>
 					<h1>Choices</h1>
 					<% if(choices.length === 0) { %>
-					<% var choice = {"id": "new", "text": ""}; %>
+					<% var choice = {'id': 'new', 'text': ''}; %>
 					<% var choices = [choice, choice]; %>
 					<% } %> 
 					<% choices.forEach(function(choice) { %>
 					<div class="form-group">
-						<input name="choices[]" choice-id="<%= choice.id %>" style="width: 80%; display: inline-block;" type="text" class="form-control" value="<%= choice.text %>">
-						<button type="button" class="btn btn-danger delete" style="display: inline-block; width: 18%;">DELETE</button>
+						<input name="choices[]" class="choice" choice-id="<%= choice.id %>" type="text" class="form-control" value="<%= choice.text %>">
+						<button type="button" class="btn btn-danger delete">DELETE</button>
 					</div>
 					<% }) %>
 					
@@ -56,7 +56,7 @@
 					id,
 					text;
 
-				$('[name="choices[]"]').each(function(key, val) {
+				$('.choice').each(function(key, val) {
 					
 					id = $(val).attr('choice-id');
 					text = $(val).val();
@@ -101,7 +101,8 @@
 					.insertAfter('.form-group:nth(-3)')
 					.find('input')
 					.attr('choice-id','new')
-					.attr('value','');
+					.attr('value','')
+					.val('');
 
 				logChoices();
 				return false;
@@ -118,7 +119,7 @@
 
 			$('.delete').click(function() {
 
-				if($('[name="choices[]"]').length <= 2) {
+				if($('.choice').length <= 2) {
 					console.log('Need at least 2 choices');
 					return false;
 				}
@@ -133,4 +134,15 @@
 			});
 		});
 	</script>
+	<style>
+		.choice {
+			width: 80%;
+			display: inline-block;
+		}
+
+		.delete {
+			display: inline-block;
+			width: 18%;
+		}
+	</style>
 <% include ../../layout/footer %>

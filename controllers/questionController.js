@@ -1,43 +1,32 @@
 import models from '../models';
-const {question} = models;
 import requireLogin from '../middleware/authMiddleware';
 import parser from '../config/parser';
 
-export default app => {
-	app.get('/question', requireLogin, (req, res) => {
-		res.send('nothing here :)');
-	});
+const { question } = models;
 
-	app.post('/question', requireLogin, parser.url, (req, res) => {
-		question.create({
-			text: req.body.text
-		})
-		.then(d => {
-			res.redirect('/admin/question/edit/'+d.id);
-		});
-	});
+export default (app) => {
+  app.get('/question', requireLogin, (req, res) => res.send('nothing here :)'));
 
-	app.put('/question/:id', requireLogin, parser.url, (req, res) => {
-		question.update({
-			text: req.body.text
-		}, {
-			where: {
-				id: req.params.id
-			}
-		})
-		.then(d => {
-			res.send(d);
-		})
-		.catch(e => {
-			console.log(e);
-		});
-	});
+  app.post('/question', requireLogin, parser.url, (req, res) => {
+    question.create({ text: req.body.text })
+      .then(data => res.redirect(`/admin/question/edit/${data.id}`));
+  });
 
-	app.delete('/question/:id', requireLogin, parser.url, (req, res) => {
-		console.log(req.params.id);
-		question.destroy({where: {id: req.params.id}})
-			.then(d => {
-				res.send('');
-			});
-	});
+  app.put('/question/:id', requireLogin, parser.url, (req, res) => {
+    question.update({
+      text: req.body.text,
+    }, {
+      where: {
+        id: req.params.id,
+      },
+    })
+    .then(data => res.send(data))
+    .catch(error => console.log(error));
+  });
+
+  app.delete('/question/:id', requireLogin, parser.url, (req, res) => {
+    console.log(req.params.id);
+    question.destroy({ where: { id: req.params.id } })
+      .then(() => res.send(''));
+  });
 };

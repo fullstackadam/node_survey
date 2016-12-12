@@ -1,50 +1,40 @@
 import models from '../models';
-const {choice} = models;
 import requireLogin from '../middleware/authMiddleware';
 import parser from '../config/parser';
 
-export default app => {
+const { choice } = models;
 
-	app.get('/choice', requireLogin, (req, res) => {
+export default (app) => {
+  /* app.get('/choice', requireLogin, (req, res) => {
+  });*/
 
-	});
+  app.post('/choice', requireLogin, parser.json, (req, res) => {
+    req.body.choices.forEach((choiceItem) => {
+      const choiceObj = {
+        question_id: choiceItem.question_id,
+        text: choiceItem.text,
+      };
 
-  
-	app.post('/choice', requireLogin, parser.json, (req, res) => {
+      // if not new choice add id to choice object
 
-		var addedChoices = {'choices': []};
+      if (choiceItem.id !== 'new') {
+        choiceObj.id = choiceItem.id;
+      }
 
-		req.body.choices.forEach(choice_item => {
+      choice.upsert(choiceObj)
+        .then(data => console.log(data));
+    });
 
-			var choice_obj = {
-				question_id: choice_item.question_id,
-				text: choice_item.text
-			};
+    res.send('');
+  });
 
-			// if not new choice add id to choice object
+  /* app.put('/choice/:id', requireLogin, parser.json, (req, res) => {
 
-			if(choice_item.id !== 'new') {
-				choice_obj.id = choice_item.id;
-			}
+  });*/
 
-			choice.upsert(choice_obj)
-			.then(d => {
-				console.log(d);
-			});
-		});
-		
-		res.send('');
-	});
-
-	app.put('/choice/:id', requireLogin, parser.json, (req, res) => {
-
-	});
-
-	app.delete('/choice/:id', requireLogin, parser.url, (req, res) => {
-		choice.destroy({where: {id: req.params.id}})
-			.then(d => {
-				console.log(d);
-			});
-		res.send('');
-	});
+  app.delete('/choice/:id', requireLogin, parser.url, (req, res) => {
+    choice.destroy({ where: { id: req.params.id } })
+      .then(data => console.log(data));
+    res.send('');
+  });
 };
