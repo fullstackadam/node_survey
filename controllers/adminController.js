@@ -1,24 +1,29 @@
 import crypto from 'crypto';
 import requireLogin from '../middleware/authMiddleware';
-import parser from '../config/parser';
 import models from '../models';
 
-const { question, user } = models;
+const { question, user,} = models;
 
 export default (app) => {
-  app.post('/login', parser.url, (req, res) => {
+  app.post('/login', (req, res) => {
     user.findOne({ where: { email: req.body.email } })
       .then((currentUser) => {
+        console.log(`we have email: ${currentUser.email}`);
         if (!currentUser) {
           // flash message 'Invalid email or password.'
         } else {
           const hash = crypto.pbkdf2Sync(req.body.password, currentUser.salt, 1000, 64).toString('hex');
 
           if (hash === currentUser.hash) {
-            const sess = req.session;
-            sess.admin = true;
-            // console.log(req.session);
-            res.redirect('/admin');
+            console.log('we have hash');
+            
+            req.session.admin = true;
+
+            console.log(`session admin: ${req.session.admin}`);
+
+            req.session.save(() => {
+              res.redirect('/admin');
+            });
           } else {
             res.redirect('/login');
           }
@@ -35,9 +40,11 @@ export default (app) => {
   });
 
   app.get('/logout', requireLogin, (req, res) => {
-    const sess = req.session;
-    sess.admin = undefined;
-    res.redirect('/');
+    req.session.admin = undefined;
+    req.session.save(() => {
+      res.redirect('/');
+    });
+    //session.destroy({ where: { sid: req.session.id } });
   });
 
   app.get('/admin', requireLogin, (req, res) => {
@@ -53,7 +60,7 @@ export default (app) => {
       .catch(() => res.send('No questions found'));
   });
 
-  app.get('/admin/question/edit/:id', requireLogin, parser.url, (req, res) => {
+  app.get('/admin/question/edit/:id', requireLogin, (req, res) => {
     const title = 'Edit Question';
 
     const render = (currentQuestion, choices) => {
