@@ -113,17 +113,6 @@ choice.belongsTo(question, {
   constraints: foreignKeyConstraints,
 });
 
-question.hasMany(choice, {
-  as: 'Choices',
-  foreignKey: 'question_id',
-  constraints: foreignKeyConstraints,
-});
-
-choice.belongsTo(question, {
-  foreignKey: 'question_id',
-  constraints: foreignKeyConstraints,
-});
-
 session.hasMany(answer, {
   as: 'Answers',
   foreignKey: 'session_id',

@@ -1,5 +1,6 @@
 import express from 'express';
 import session from 'express-session';
+import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import dbConnection from './config/db'; // Sequelize
 import guestController from './controllers/guestController';
@@ -11,6 +12,11 @@ import choiceController from './controllers/choiceController';
 const SequelizeStore = require('connect-session-sequelize')(session.Store);
 
 const app = express();
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+  extended: true,
+}));
 
 app.use(cookieParser());
 
@@ -28,6 +34,9 @@ app.use(session({
     checkExpirationInterval: thirtyMinutes,
     expiration: twoWeeks,
   }),
+  resave: true,
+  saveUninitialized: true,
+  //cookie: { secure: true },
 }));
 
 const port = process.env.PORT || 3000;

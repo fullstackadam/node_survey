@@ -56,7 +56,7 @@ export default (app) => {
       });
   });
 
-  app.post('/answer_question', parser.url, (req, res) => {
+  app.post('/answer_question', (req, res) => {
     const questionId = req.param('question');
     const answerId = req.param('answer');
     const sessionId = req.session.id;

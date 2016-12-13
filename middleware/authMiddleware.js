@@ -1,5 +1,7 @@
 export default (req, res, next) => {
-  if (!req.session.admin) {
+  const sess = req.session;
+  
+  if (!sess.admin) {
     console.log('fail--');
     res.redirect('/login');
   } else {
